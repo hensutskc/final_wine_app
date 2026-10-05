@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Wine, Package, Sparkles, LogOut, ArrowRight, Home as HomeIcon, User } from 'lucide-react';
 import logo from "../../logo.png";
 import winegrapes from "../../winegrapes.png";
+import WorldMap from "./WorldMap";
 
 export function Home() {
   const navigate = useNavigate();
@@ -125,7 +126,7 @@ export function Home() {
             </div>
           </div>
         </section>
-
+<WorldMap />
         {/* Features Grid */}
         <section className="px-6 pb-24">
           <div className="grid grid-cols-1 gap-6">

@@ -19,14 +19,19 @@ export default function WorldMap() { /* creates the function of world map - can 
         const data = window.google.visualization.arrayToDataTable([ /* makes the data ready to be plaecd into chart */
           ["Country", "Popularity"],
           ["Germany", 200],
-          ["United States", 300],
+          ["United States", 800],
           ["Brazil", 400],
-          ["Canada", 500],
+          ["Canada", 200],
           ["France", 600],
           ["RU", 700],
         ]);
 
-        const options = {}; /* use defult */
+        const options = {
+                backgroundColor: "transparent",
+                colorAxis: {
+                    colors: ["#dfd094", "#c9bb73", "#b09332"], },
+
+        }; /* use defult */
 
         const chart = new window.google.visualization.GeoChart(
           chartRef.current
