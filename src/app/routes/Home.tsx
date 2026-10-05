@@ -176,8 +176,8 @@ export function Home() {
         <div className="border-t border-[#D4AF37]/20 bg-gradient-to-t from-[#D4AF37]/5 to-transparent">
           <div className="px-6 py-12">
             <div className="text-center">
-              <p className="text-sm text-gray-500 tracking-wide">
-                CRAFTED FOR WINE ENTHUSIASTS
+              <p className="text-sm text-gray-500 tracking-wide font-bold">
+                Drink Responsibly: https://www.healthnz.govt.nz/health-topics/mental-health/alcohol-and-drug-addiction/drinking-responsibly
               </p>
             </div>
           </div>
