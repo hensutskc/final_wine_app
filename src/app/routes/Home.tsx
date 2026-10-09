@@ -120,13 +120,18 @@ export function Home() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/5 via-transparent to-transparent"></div>
           <div className="px-6 py-8 relative">
             <div className="max-w-3xl">
-              <h1 className="text-6xl mb-6 bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
-                Your Personal Wine Journey
+              <h1 className="text-6xl ml-[250px] mb-6 bg-gradient-to-r from-white via-[#D4AF37] to-white bg-clip-text text-transparent">
+                Our Wine World
               </h1>
+                    <div className="rounded-2xl w-[775px] ml-[100px] max-w-full shadow-md p-[4px] bg-gradient-to-r from-[#FFF2B3] via-[#D4AF37] to-[#FFF2B3]">
+                    <div className="rounded-[12px] bg-black overflow-hidden">
+                  <WorldMap />
+                </div>
+              </div>
             </div>
           </div>
         </section>
-<WorldMap />
+
         {/* Features Grid */}
         <section className="px-6 pb-24">
           <div className="grid grid-cols-1 gap-6">
