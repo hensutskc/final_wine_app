@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router';
 import { useAuth } from '../hooks/useAuth.tsx';
 import { Button } from '../components/ui/button';
 import { Wine, Package, Sparkles, LogOut, ArrowRight, Home as HomeIcon, User } from 'lucide-react';
+// @ts-ignore
 import logo from "../../logo.png";
+// @ts-ignore
 import winegrapes from "../../winegrapes.png";
 import WorldMap from "./WorldMap";
 
