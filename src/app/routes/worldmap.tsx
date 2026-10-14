@@ -1,67 +1,93 @@
-import { useEffect, useRef } from "react"; /* useEffect allows google to draw the map while useRef uses the html code */
 
-declare global { /*telling the code to source from google (a global element)*/
+import { useEffect, useRef } from "react"; // Imports React hooks for loading the map and referencing its HTML element
+
+declare global {
   interface Window {
-    google: any; /* use google to find the chart map and the any stops it from giving error*/
+    google: any; // Allows TypeScript to recognise the Google Charts library
   }
 }
 
-export default function WorldMap() { /* creates the function of world map - can call on it throughout the program, making the program flexible */
-  const chartRef = useRef<HTMLDivElement>(null); /* shows where the map should go once it has been called upon */
+export default function WorldMap() { // Creates the WorldMap component
+  const chartRef = useRef<HTMLDivElement>(null); // References the HTML element where the map will appear
 
-  useEffect(() => { /* once the world map loads, run this code etc*/
-    const drawMap = () => {
-      window.google.charts.load("current", { /* talkng to the chart, getting read to add the data(clean slate) */
-        packages: ["geochart"], /* makes sure the geo chart is the chart loaded*/
+  useEffect(() => { // Runs the map setup when the component mounts
+    let cancelled = false; // Tracks whether the component has been removed
+
+    const drawMap = () => { // Creates the function responsible for loading the map
+      window.google.charts.load("current", { // Loads the Google Charts library
+        packages: ["geochart"], // Specifies the GeoChart package
       });
 
-      window.google.charts.setOnLoadCallback(() => { /* loads the most up to date geochart */
-        const data = window.google.visualization.arrayToDataTable([ /* makes the data ready to be plaecd into chart */
-          ["Country", "Popularity"],
-          ["Germany", 200],
-          ["United States", 800],
-          ["Brazil", 400],
-          ["Canada", 200],
-          ["France", 600],
-          ["RU", 700],
-        ]);
+      window.google.charts.setOnLoadCallback(async () => { // Waits until Google Charts is ready
+        try {
+          const response = await fetch(
+            "http://127.0.0.1:8000/api/wines-by-country"
+          ); // Requests the wine counts from the FastAPI server
 
-        const options = {
-                backgroundColor: "transparent",
-                colorAxis: {
-                    colors: ["#dfd094", "#c9bb73", "#b09332"], },
+          if (!response.ok) { // Checks whether the API request succeeded
+            throw new Error("Failed to retrieve wine data");
+          }
 
-        }; /* use defult */
+          const wines: { country: string; count: number }[] =
+            await response.json(); // Converts the API's JSON response into JavaScript data
 
-        const chart = new window.google.visualization.GeoChart(
-          chartRef.current
-        );
+          if (cancelled || !chartRef.current) return; // Stops if the component is no longer mounted
 
-        chart.draw(data, options);
+          const chartData = [ // Creates the data table for Google GeoChart
+            ["Country", "Number of Wines"], // Defines the two column headings
+            ...wines.map((wine) => [wine.country, wine.count]), // Converts each country and count into a chart row
+          ];
+
+          const data =
+            window.google.visualization.arrayToDataTable(chartData); // Converts the rows into a Google Charts DataTable
+
+          const options = { // Defines the appearance of the map
+            backgroundColor: "transparent", // Keeps the map background transparent
+            colorAxis: { // Controls the colours of countries based on their wine counts
+              colors: ["#dfd094", "#c9bb73", "#b09332"], // Preserves your existing gold colour scheme
+            },
+          };
+
+          const chart = new window.google.visualization.GeoChart(
+            chartRef.current
+          ); // Creates the map inside the referenced HTML element
+
+          chart.draw(data, options); // Draws the map using the Excel country counts
+
+        } catch (error) { // Handles errors when retrieving or displaying data
+          if (!cancelled) {
+            console.error("Error loading wine map:", error); // Displays the error in the browser console
+          }
+        }
       });
     };
 
-    // Check if Google Charts has already been loaded
-    if (!window.google) {
-      const script = document.createElement("script"); /* creates script for the chart to be loaded*/
+    if (!window.google?.charts) { // Checks whether Google Charts is already available
+      const script = document.createElement("script"); // Creates a script element to load Google Charts
 
-      script.src = "https://www.gstatic.com/charts/loader.js";
-      script.async = true;
+      script.src = "https://www.gstatic.com/charts/loader.js"; // Sets the Google Charts library URL
+      script.async = true; // Allows the script to load without blocking the page
 
-      script.onload = drawMap; /* when google loads, draw map */
+      script.onload = () => { // Runs once the Google Charts script has loaded
+        if (!cancelled) drawMap(); // Loads the map if the component still exists
+      };
 
-      document.head.appendChild(script);
+      document.head.appendChild(script); // Adds the script to the webpage
     } else {
-      drawMap();
+      drawMap(); // Loads the map immediately if Google Charts is already available
     }
+
+    return () => { // Cleans up when the component is removed
+      cancelled = true; // Prevents pending requests from drawing an outdated map
+    };
   }, []);
 
-  return ( /* apperance of the map */
+  return ( // Returns the HTML element that displays the map
     <div
       ref={chartRef}
       style={{
-        width: "100%",
-        height: "500px",
+        width: "100%", // Makes the map fill the width of its container
+        height: "500px", // Sets the map height
       }}
     />
   );
