@@ -19,11 +19,12 @@ app.add_middleware(  #uses the import to allow acsess to the API
 #similar code to before switch
 file_path = Path(__file__).parent / "wine_company_inventory.xlsx"  # finds the excel sheet with location in same folder
 
-df = pd.read_excel(file_path, sheet_name="Wine Inventory")  #turns the excel sheet into readable data
-
 @app.get("/api/wines-by-country")  #creates a GET endpoint 
 
 def wines_by_country():  #creating fucntion that can be called throughout the code
+
+    df = pd.read_excel(file_path, sheet_name="Wine Inventory")  #turns the excel sheet into readable data
+
     country_counts = df["Country of Origin"].value_counts()  #tally of wines from each country
 
     return [  
