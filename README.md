@@ -9,3 +9,4 @@
 
   Run `npm run dev` to start the development server.
   
+  Run `python -m uvicorn reading_wines.main:app --reload` to launch the world map
