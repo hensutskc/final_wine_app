@@ -1,93 +1,92 @@
 
-import { useEffect, useRef } from "react"; // Imports React hooks for loading the map and referencing its HTML element
-
+import { useEffect, useRef } from "react"; // imports react hooks 
 declare global {
   interface Window {
-    google: any; // Allows TypeScript to recognise the Google Charts library
+    google: any; // allows for the google chart library to be recognised
   }
 }
 
-export default function WorldMap() { // Creates the WorldMap component
-  const chartRef = useRef<HTMLDivElement>(null); // References the HTML element where the map will appear
+export default function WorldMap() { // creates the worldmap component
+  const chartRef = useRef<HTMLDivElement>(null); // references how the map is coded in HTML
 
-  useEffect(() => { // Runs the map setup when the component mounts
-    let cancelled = false; // Tracks whether the component has been removed
+  useEffect(() => { // runs the map set up
+    let cancelled = false; // checks if the component has been removed
 
-    const drawMap = () => { // Creates the function responsible for loading the map
-      window.google.charts.load("current", { // Loads the Google Charts library
-        packages: ["geochart"], // Specifies the GeoChart package
+    const drawMap = () => { // creating the fucnction that creates the map
+      window.google.charts.load("current", { // loads the google chat library
+        packages: ["geochart"], // chooses the geochart option for world map
       });
 
-      window.google.charts.setOnLoadCallback(async () => { // Waits until Google Charts is ready
+      window.google.charts.setOnLoadCallback(async () => { // waits untill google chart is ready before continuing
         try {
           const response = await fetch(
             "http://127.0.0.1:8000/api/wines-by-country"
-          ); // Requests the wine counts from the FastAPI server
+          ); // this requests wines from the seperate API server that stored the counted tally
 
-          if (!response.ok) { // Checks whether the API request succeeded
-            throw new Error("Failed to retrieve wine data");
+          if (!response.ok) { // makes sure that the wine data is recived
+            throw new Error("Failed to retrieve wine data"); // incase of error, the program can still run
           }
 
           const wines: { country: string; count: number }[] =
-            await response.json(); // Converts the API's JSON response into JavaScript data
+            await response.json(); // converts into stirngs and numbers for javascript
 
-          if (cancelled || !chartRef.current) return; // Stops if the component is no longer mounted
+          if (cancelled || !chartRef.current) return; // stops if the program is no longer running
 
-          const chartData = [ // Creates the data table for Google GeoChart
-            ["Country", "Number of Wines"], // Defines the two column headings
-            ...wines.map((wine) => [wine.country, wine.count]), // Converts each country and count into a chart row
+          const chartData = [ // creates the table for the data to be read by the geochart
+            ["Country", "Number of Wines"], // gives the table collums a titl
+            ...wines.map((wine) => [wine.country, wine.count]), // puts country and count into a row
           ];
 
           const data =
-            window.google.visualization.arrayToDataTable(chartData); // Converts the rows into a Google Charts DataTable
+            window.google.visualization.arrayToDataTable(chartData); // makes it readable for google chart
 
-          const options = { // Defines the appearance of the map
-            backgroundColor: "transparent", // Keeps the map background transparent
-            colorAxis: { // Controls the colours of countries based on their wine counts
-              colors: ["#dfd094", "#c9bb73", "#b09332"], // Preserves your existing gold colour scheme
+          const options = { // creates the apperance of the map
+            backgroundColor: "transparent", // bg transparent
+            colorAxis: { // changes of colour for wine tally
+              colors: ["#dfd094", "#c9bb73", "#b09332"], // gold scheme
             },
           };
 
           const chart = new window.google.visualization.GeoChart(
             chartRef.current
-          ); // Creates the map inside the referenced HTML element
+          ); // makes the map inside the html element
 
-          chart.draw(data, options); // Draws the map using the Excel country counts
+          chart.draw(data, options); // draws the map using the data retrived
 
-        } catch (error) { // Handles errors when retrieving or displaying data
+        } catch (error) { // error handeling when dealing with data reading
           if (!cancelled) {
-            console.error("Error loading wine map:", error); // Displays the error in the browser console
+            console.error("Error loading wine map:", error); // displays the error if nesessary
           }
         }
       });
     };
 
-    if (!window.google?.charts) { // Checks whether Google Charts is already available
-      const script = document.createElement("script"); // Creates a script element to load Google Charts
+    if (!window.google?.charts) { // checks wether the chart is already avalible
+      const script = document.createElement("script"); // creates a "script" element to see if its alread loaded
 
-      script.src = "https://www.gstatic.com/charts/loader.js"; // Sets the Google Charts library URL
-      script.async = true; // Allows the script to load without blocking the page
+      script.src = "https://www.gstatic.com/charts/loader.js"; // google chart library url
+      script.async = true; // allows the script to run without blocking the page
 
-      script.onload = () => { // Runs once the Google Charts script has loaded
-        if (!cancelled) drawMap(); // Loads the map if the component still exists
+      script.onload = () => { // only runs when the google chart script has loaded
+        if (!cancelled) drawMap(); // loads the map only if the component exists
       };
 
-      document.head.appendChild(script); // Adds the script to the webpage
+      document.head.appendChild(script); // adding the script to the app
     } else {
-      drawMap(); // Loads the map immediately if Google Charts is already available
+      drawMap(); // loads the map instatnly if the chart is already loaded
     }
 
-    return () => { // Cleans up when the component is removed
-      cancelled = true; // Prevents pending requests from drawing an outdated map
+    return () => { // when something is removed, this continues the code running
+      cancelled = true; // prevents and outdated map from being drawn
     };
   }, []);
 
-  return ( // Returns the HTML element that displays the map
+  return ( // returns the html that displays the map
     <div
       ref={chartRef}
       style={{
-        width: "100%", // Makes the map fill the width of its container
-        height: "500px", // Sets the map height
+        width: "100%", // makes the map fill the container
+        height: "500px", // sets the map high at 500px
       }}
     />
   );
